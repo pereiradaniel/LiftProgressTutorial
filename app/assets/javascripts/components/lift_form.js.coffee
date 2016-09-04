@@ -2,15 +2,26 @@
   getInitialState: ->
     date: ''
     liftname: ''
-    ismetric: ''
+    ismetric: false
     weightlifted: ''
     repsperformed: ''
-    onerm: ''
+    onerm: 0
+    coefficients: {
+      1: 1, 2: .943, 3: .906, 4: .881, 5: .851, 6: .831, 7: .807, 8: .786, 9: .765, 10: .744
+    }
+  calculateOneRm: ->
+    if @state.weightlifted and @state.repsperformed
+      @state.onerm = @state.weightlifted / @state.coefficients[@state.repsperformed]
+    else
+      0
   handleValueChange: (e) ->
     valueName = e.target.name
     @setState "#{ valueName }": e.target.value
+  toggleUnit: (e) ->
+    e.preventDefault()
+    @setState ismetric: !@state.ismetric
   valid: ->
-    @state.date && @state.liftname && @state.ismetric && @state.weightlifted && @state.repsperformed && @state.onerm
+    @state.date && @state.liftname && @state.weightlifted && @state.repsperformed && @state.onerm
   handleSubmit: (e) ->
     e.preventDefault()
     $.post '', { lift: @state }, (data) =>
@@ -37,13 +48,10 @@
           name: 'liftname'
           value: @state.liftname
           onChange: @handleValueChange
-        React.DOM.input
-          type: 'boolean'
-          className: 'form-control'
-          placeholder: 'ismetric'
-          name: 'ismetric'
-          value: @state.ismetric
-          onChange: @handleValueChange
+        React.DOM.a
+          className: 'btn btn-primary'
+          onClick: @toggleUnit
+          'Metric = ' + @state.ismetric.toString()
         React.DOM.input
           type: 'number'
           className: 'form-control'
@@ -53,20 +61,16 @@
           onChange: @handleValueChange
         React.DOM.input
           type: 'number'
+          min: 1
+          max: 10
           className: 'form-control'
           placeholder: 'repsperformed'
           name: 'repsperformed'
           value: @state.repsperformed
-          onChange: @handleValueChange
-        React.DOM.input
-          type: 'number'
-          className: 'form-control'
-          placeholder: 'onerm'
-          name: 'onerm'
-          value: @state.onerm
           onChange: @handleValueChange
         React.DOM.button
           type: 'submit'
           className: 'btn btn-primary'
           disabled: !@valid()
           'Create Lift'
+        React.createElement OneRmBox, onerm: @calculateOneRm()
