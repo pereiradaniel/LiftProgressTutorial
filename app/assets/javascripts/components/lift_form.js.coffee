@@ -70,7 +70,7 @@ coefficients = {
           name: 'repsperformed'
           value: @state.repsperformed
           onChange: @handleValueChange
-      React.DOM.a
+      React.DOM.button
         className: 'btn btn-primary'
         onClick: @toggleUnit
         'Metric = ' + @state.ismetric.toString()
